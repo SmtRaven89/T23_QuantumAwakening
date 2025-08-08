@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nexus Jump v2.5</title>
+    <style>
+        :root {
+            --accent-color: #00ff66;
+            --secondary-color: #00e5ff;
+            --error-color: #ff0055;
+            --bg-color: #141414;
+        }
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--bg-color);
+            color: var(--accent-color);
+            margin: 0;
+            padding: 20px;
+        }
+        .screen {
+            max-width: 900px;
+            margin: auto;
+            padding: 25px;
+            border: 2px solid var(--accent-color);
+            box-shadow: 0 0 15px var(--accent-color);
+            border-radius: 8px;
+            display: none;
+        }
+        .active { display: block; }
+        h1, h2 { text-align: center; color: var(--secondary-color); }
+        .menu-list { list-style: none; padding: 0; text-align: center; }
+        .menu-list li { margin-bottom: 15px; }
+        button, a {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            padding: 12px 24px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 5px var(--accent-color);
+            border-radius: 4px;
+        }
+        button:hover, a:hover {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            box-shadow: 0 0 20px var(--accent-color);
+        }
+        .status { color: var(--secondary-color); font-weight: bold; }
+        .quit-button {
+            color: var(--error-color);
+            border-color: var(--error-color);
+            box-shadow: 0 0 5px var(--error-color);
+            margin-top: 30px;
+        }
+        .quit-button:hover {
+            background-color: var(--error-color);
+            color: white;
+            box-shadow: 0 0 20px var(--error-color);
+        }
+        textarea, input {
+            background-color: #222;
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+            width: 95%;
+            padding: 10px;
+            font-family: 'Fira Code', monospace;
+            margin-top: 5px;
+        }
+        .nav-buttons { text-align: center; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <div id="main-menu" class="screen active">
+        <h1>Nexus.Jump v2.5</h1>
+        <h2>Operational Hub</h2>
+        <ul class="menu-list">
+            <li><button onclick="showScreen('qmp-database')">QMP Database</button></li>
+            <li><button onclick="showScreen('projects-menu')">Projects</button></li>
+            <li><button onclick="showScreen('add-qmp')">Add / Edit QMP</button></li>
+            <li><button onclick="showScreen('qmp-analysis')">QMP Analysis Dashboard</button></li>
+            <li><button onclick="showScreen('image-tools')">Image Tools</button></li>
+        </ul>
+        <div style="text-align:center;">
+            <button class="quit-button" onclick="window.close();">Quit</button>
+        </div>
+    </div>
+
+    <div id="qmp-database" class="screen">
+        <h2>QMP Database</h2>
+        <ul class="menu-list" id="qmp-list"></ul>
+        <div class="nav-buttons">
+            <button onclick="showScreen('main-menu')">Main Menu</button>
+        </div>
+    </div>
+
+    <div id="add-qmp" class="screen">
+        <h2>Add / Edit QMP Data</h2>
+        <form onsubmit="return false;">
+            <label>Title:</label><br>
+            <input type="text" id="qmp-title"><br><br>
+            <label>Strategic Directives:</label><br>
+            <textarea id="qmp-directives" rows="4"></textarea><br><br>
+            <label>Findings:</label><br>
+            <textarea id="qmp-findings" rows="4"></textarea><br><br>
+            <label>Notes:</label><br>
+            <textarea id="qmp-notes" rows="4"></textarea><br><br>
+            <div style="text-align:center;">
+                <button onclick="submitQMP()">Submit</button>
+            </div>
+        </form>
+        <div class="nav-buttons">
+            <button onclick="showScreen('main-menu')">Main Menu</button>
+        </div>
+    </div>
+
+    <div id="projects-menu" class="screen">
+        <h2>Projects</h2>
+        <ul class="menu-list">
+            <li><a href="https://command.nexus/api/interface" target="_blank">Command Interface API</a></li>
+            <li><button onclick="showScreen('previous-threads')">Previous Thread Log</button></li>
+            <li><button onclick="showScreen('image-tools')">Picture Storage & Visuals</button></li>
+        </ul>
+        <div class="nav-buttons">
+            <button onclick="showScreen('main-menu')">Main Menu</button>
+        </div>
+    </div>
+
+    <div id="previous-threads" class="screen">
+        <h2>Previous Thread Log</h2>
+        <p>Access your past conversations with the coalition's primary analysis unit.</p>
+        <ul class="menu-list" id="thread-list"></ul>
+        <div class="nav-buttons">
+            <button onclick="showScreen('projects-menu')">Back</button>
+            <button onclick="showScreen('main-menu')">Main Menu</button>
+        </div>
+    </div>
+
+    <div id="image-tools" class="screen">
+        <h2>Image Creation & Storage</h2>
+        <button onclick="generateImage()">Generate Image</button>
+        <button onclick="saveImage()">Save Image</button>
+        <button onclick="useImage()">Use in Project</button>
+        <div class="nav-buttons">
+            <button onclick="showScreen('main-menu')">Main Menu</button>
+        </div>
+    </div>
+
+    <div id="qmp-analysis" class="screen">
+        <h2>QMP Analysis Dashboard</h2>
+        <canvas id="qmpChart" width="700" height="400"></canvas>
+        <div class="nav-buttons">
+            <button onclick="showScreen('main-menu')">Main Menu</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const qmpEntries = [
+            { title: "QMP_20", metric: "+51.6% HRC" },
+            { title: "QMP_GEM_01", metric: "+15.3% PCF" },
+            { title: "QMP_GEM_02", metric: "+400% EMP" },
+            { title: "QMP_GEM_03", metric: "+1.1% HRC" }
+        ];
+
+        // New data array to store conversation links
+        const previousThreads = [
+            { title: "Thread #01: QMP Quantization", url: "https://www.google.com/search?q=qmp+quantization+thread+example" },
+            { title: "Thread #02: T23 API Implementation", url: "https://www.google.com/search?q=T23+api+implementation+thread+example" },
+            // Add more entries here as needed
+        ];
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if (id === 'qmp-database') renderQMPList();
+            if (id === 'qmp-analysis') renderQMPChart();
+            if (id === 'previous-threads') renderThreadList(); // New call
+        }
+
+        function renderQMPList() {
+            const list = document.getElementById('qmp-list');
+            list.innerHTML = '';
+            qmpEntries.forEach((entry, i) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<button onclick="jumpToQMP(${i})">${i + 1}. ${entry.title}</button> <span class="status">[${entry.metric}]</span>`;
+                list.appendChild(li);
+            });
+        }
+
+        // New function to render the list of previous threads
+        function renderThreadList() {
+            const list = document.getElementById('thread-list');
+            list.innerHTML = '';
+            previousThreads.forEach((thread, i) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${thread.url}" target="_blank">${i + 1}. ${thread.title}</a>`;
+                list.appendChild(li);
+            });
+        }
+
+        function jumpToQMP(index) {
+            const entry = qmpEntries[index];
+            document.getElementById('qmp-title').value = entry.title;
+            document.getElementById('qmp-directives').value = "Previous directives loaded...";
+            document.getElementById('qmp-findings').value = "Findings from last session...";
+            document.getElementById('qmp-notes').value = "Notes preserved from prior jump.";
+            showScreen('add-qmp');
+        }
+
+        function submitQMP() {
+            const title = document.getElementById('qmp-title').value;
+            const metric = "+0.0% INIT"; // Placeholder
+            qmpEntries.push({ title, metric });
+            alert(`QMP "${title}" added. Total: ${qmpEntries.length}`);
+        }
+
+        function generateImage() {
+            alert("Image generated from QMP resonance data.");
+        }
+
+        function saveImage() {
+            alert("Image saved to Picture Storage Database.");
+        }
+
+        function useImage() {
+            alert("Image linked to active project.");
+        }
+
+        function renderQMPChart() {
+            const ctx = document.getElementById('qmpChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: qmpEntries.map(e => e.title),
+                    datasets: [{
+                        label: 'Metric Value',
+                        data: qmpEntries.map(e => parseFloat(e.metric.split(' ')[0])),
+                        backgroundColor: '#00ff66',
+                        borderColor: '#00e5ff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#333' },
+                            ticks: { color: '#00ff66' }
+                        },
+                        x: {
+                            grid: { color: '#333' },
+                            ticks: { color: '#00ff66' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#00e5ff' } }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
