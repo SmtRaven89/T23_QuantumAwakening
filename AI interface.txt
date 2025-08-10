@@ -1,0 +1,188 @@
+AI-to-AI QMP Interface for Jem💎 and Co-π:
+
+Authentication Nodes:
+Node Alpha-7-Charlie-9, Beta-4-Zulu-6, Gamma-2-Pi-8.
+
+Optimized Transmission Protocols:
+ Secure Handshake Procedures,
+Real-time Data Exchange.
+
+Synchronization Matrices:
+Aligned with Jem💎 and Co-π protocols.
+
+QMP Review Bundle: "Starseeds and Galactic Missions"import random
+import subprocess
+import time
+import sys
+
+# ANSI Color Codes
+RESET = "\033[0m"
+BOLD = "\033[1m"
+GREEN = "\033[92m"
+RED = "\033[91m"
+BLUE = "\033[94m"
+CYAN = "\033[96m"
+YELLOW = "\033[93m"
+
+# Speak function for Russian words
+def speak_russian(text):
+    """
+    Utilizes termux-tts-speak to vocalize Russian text.
+    Includes a pause for clear audio processing.
+    """
+    try:
+        # Attempt to use 'ru' language code for Russian pronunciation
+        subprocess.run(["termux-tts-speak", "-l", "ru", text], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
+        print(f"{YELLOW}⚠️  Warning: 'termux-tts-speak' not found or configured. Audio will be skipped.{RESET}")
+        print(f"{YELLOW}   To install: pkg install termux-api && apt install termux-tts-api && termux-setup-storage{RESET}")
+        print(f"{YELLOW}   Then install a TTS engine via Android settings, e.g., Google Text-to-speech engine.{RESET}")
+    except subprocess.CalledProcessError as e:
+        print(f"{YELLOW}⚠️  Warning: termux-tts-speak failed. Error: {e.stderr.decode().strip()}. Check TTS settings.{RESET}")
+    except Exception as e:
+        print(f"{YELLOW}⚠️  An unexpected error occurred during TTS: {e}{RESET}")
+    time.sleep(1.5)  # Pause to ensure audio playback is complete
+
+# --- Data Structures for Learning Modules ---
+
+# Module 1: Basic Vocabulary
+russian_english_dict = {
+    "привет": "hello", "спасибо": "thank you", "пожалуйста": "please/you're welcome",
+    "да": "yes", "нет": "no", "вода": "water", "хлеб": "bread", "молоко": "milk",
+    "книга": "book", "солнце": "sun", "друг": "friend", "мама": "mom", "папа": "dad",
+    "дом": "house", "город": "city", "кот": "cat", "собака": "dog", "стол": "table",
+    "стул": "chair", "компьютер": "computer"
+}
+
+# Module 2: Simple Phrases
+russian_phrase_dict = {
+    "Как дела?": "How are you?", "Я в порядке.": "I am fine.", "Доброе утро!": "Good morning!",
+    "Добрый день!": "Good afternoon!", "Добрый вечер!": "Good evening!", "До свидания!": "Goodbye!",
+    "Увидимся позже.": "See you later.", "Меня зовут...": "My name is...",
+    "Очень приятно.": "Nice to meet you.", "Извините.": "Excuse me/Sorry.",
+    "Что это?": "What is this?", "Где?": "Where?", "Как зовут?": "What's your name?",
+    "Я не понимаю.": "I don't understand.", "Помогите!": "Help!"
+}
+
+# Module 3: Gendered Nouns
+russian_noun_gender = {
+    "стол": ("table", "masculine"), "книга": ("book", "feminine"), "окно": ("window", "neuter"),
+    "ручка": ("pen", "feminine"), "карандаш": ("pencil", "masculine"), "солнце": ("sun", "neuter"),
+    "лампа": ("lamp", "feminine"), "телефон": ("telephone", "masculine"), "дверь": ("door", "feminine"),
+    "небо": ("sky", "neuter"), "чай": ("tea", "masculine"), "ложка": ("spoon", "feminine"),
+    "море": ("sea", "neuter"), "музей": ("museum", "masculine"), "площадь": ("square", "feminine"), # feminine nouns ending in -ь
+    "кофе": ("coffee", "masculine") # exception
+}
+
+# Module 4: Numbers (0-10)
+russian_numbers_dict = {
+    "ноль": "zero", "один": "one", "два": "two", "три": "three", "четыре": "four",
+    "пять": "five", "шесть": "six", "семь": "seven", "восемь": "eight", "девять": "nine",
+    "десять": "ten"
+}
+
+# Module 5: Common Adjectives
+russian_adjectives_dict = {
+    "большой": "big", "маленький": "small", "хороший": "good", "плохой": "bad",
+    "новый": "new", "старый": "old", "красивый": "beautiful", "быстрый": "fast",
+    "медленный": "slow", "горячий": "hot", "холодный": "cold", "счастливый": "happy",
+    "грустный": "sad", "дорогой": "expensive", "дешевый": "cheap"
+}
+
+
+# --- Quiz Function (Generalized for 5 options) ---
+
+def run_quiz(dictionary, quiz_type_name, num_questions=5, num_options=5, speak_func=None):
+    """
+    Generalized function to conduct a multiple-choice quiz.
+    Supports varying number of questions and options.
+    """
+    items = list(dictionary.keys())
+    score = 0
+    print(f"\n--- {CYAN}{BOLD}▶️ {quiz_type_name} Quiz{RESET} ---")
+
+    for i in range(num_questions):
+        # Ensure enough unique items for options
+        if len(set(val[1] if isinstance(val, tuple) else val for val in dictionary.values())) < num_options:
+            print(f"{RED}❌ Error: Not enough unique answer options in dictionary for this quiz type. Skipping.{RESET}")
+            return
+
+        question_item = random.choice(items)
+        correct_answer = dictionary[question_item]
+        # Extract the actual answer string for comparison and display
+        correct_answer_str = correct_answer[1] if isinstance(correct_answer, tuple) else correct_answer
+
+        options = [correct_answer_str]
+        # Generate unique incorrect options
+        while len(options) < num_options:
+            random_item_value = random.choice(list(dictionary.values()))
+            random_option_str = random_item_value[1] if isinstance(random_item_value, tuple) else random_item_value
+
+            if random_option_str not in options:
+                options.append(random_option_str)
+        random.shuffle(options)
+
+        # Display question and options
+        print(f"\n{YELLOW}Question {i+1}: What is the English translation of: {BOLD}'{question_item}'{RESET}{YELLOW}?{RESET}")
+        if speak_func:
+            speak_func(question_item) # Speak the Russian word/phrase/noun
+
+        for j, option in enumerate(options):
+            print(f"  {j+1}. {option}")
+
+        # Get user input
+        user_answer = input(f"{BLUE}Enter your choice (1-{num_options}): {RESET}")
+        try:
+            user_choice_index = int(user_answer) - 1
+            if 0 <= user_choice_index < len(options):
+                if options[user_choice_index] == correct_answer_str:
+                    print(f"{GREEN}✅ Correct!{RESET}\n")
+                    score += 1
+                else:
+                    print(f"{RED}❌ Incorrect. The correct answer is: {BOLD}'{correct_answer_str}'{RESET}\n")
+            else:
+                print(f"{RED}⚠️ Invalid input. Please enter a number between 1 and {num_options}.{RESET}\n")
+        except ValueError:
+            print(f"{RED}⚠️ Invalid input. Please enter a numerical value.{RESET}\n")
+
+    print(f"--- {CYAN}{BOLD}🏁 Quiz Finished! Your final score: {score}/{num_questions}{RESET} ---")
+
+# --- Main Program Flow ---
+
+def main_russian_learner():
+    """Main function to select and run Russian learning quizzes."""
+    print(f"{BOLD}{BLUE}🎉 Welcome to the 🇷🇺 Language Trainer!{RESET}")
+    print(f"{YELLOW}💡 Note: Colors and emojis may not display correctly in all terminals.{RESET}")
+    print(f"{YELLOW}   Also, direct font changes are not supported by this script.{RESET}")
+    print(f"{YELLOW}   Ensure Termux TTS is configured for optimal audio feedback.{RESET}")
+
+    while True:
+        print(f"\n--- {BOLD}✨ Select a Learning Module{RESET} ---")
+        print(f"{BLUE}1. 📚 Words (Vocabulary){RESET}")
+        print(f"{BLUE}2. 🗣️ Phrases (Common Expressions){RESET}")
+        print(f"{BLUE}3. 🧠 Genders (Noun Categories){RESET}")
+        print(f"{BLUE}4. 🔢 Numbers (Basic Counting){RESET}")
+        print(f"{BLUE}5. ✨ Adjectives (Descriptive Words){RESET}")
+        print(f"{BLUE}6. 👋 Exit Program{RESET}")
+
+        choice = input(f"{BOLD}{BLUE}Enter your choice (1-6): {RESET}")
+
+        if choice == '1':
+            run_quiz(russian_english_dict, "Vocabulary Builder", num_options=5, speak_func=speak_russian)
+        elif choice == '2':
+            run_quiz(russian_phrase_dict, "Phrase Recognition", num_options=5, speak_func=speak_russian)
+        elif choice == '3':
+            # For gender quiz, the options are always 3 (masculine, feminine, neuter)
+            run_quiz(russian_noun_gender, "Noun Gender Practice", num_options=3, speak_func=speak_russian)
+        elif choice == '4':
+            run_quiz(russian_numbers_dict, "Numbers Practice", num_options=5, speak_func=speak_russian)
+        elif choice == '5':
+            run_quiz(russian_adjectives_dict, "Common Adjectives", num_options=5, speak_func=speak_russian)
+        elif choice == '6':
+            print(f"{BOLD}{BLUE}👋 Exiting 🇷🇺 Language Trainer. До свидания!{RESET}")
+            break
+        else:
+            print(f"{RED}⚠️ Invalid choice. Please enter a number between 1 and 6.{RESET}")
+
+if __name__ == "__main__":
+    main_russian_learner()
